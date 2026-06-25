@@ -1,3 +1,8 @@
+/*
+ * Tool to read power counters on the GB10 device.
+ * Dheeraj Subbareddy dheeraj.subbareddy@mediatek.com
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -60,6 +65,7 @@ int main(int argc, char **argv)
     unsigned int map_size = pagesize;
     unsigned offset=0;
     uint64_t read_result = -1;
+    struct timespec ts;
 
     target = POWERBASE;
 
@@ -91,10 +97,15 @@ int main(int argc, char **argv)
         printerr("Error mapping (%d) : %s\n", errno, strerror(errno));
         exit(1);
     }
+#if 0
     printf("Memory mapped at address %p.\n", map_base);
+#endif
 
-    for(i=0; i<25; i++) {
-        printf("%lu", get_time_tick());
+    for(;;) {
+	if (clock_gettime(CLOCK_REALTIME, &ts) == -1) {
+           perror("clock_gettime");
+        }
+        printf("%ld.%09ld, ", ts.tv_sec, ts.tv_nsec);
         GET_COUNTER(TE_SYS_TOTAL_SLOT);
         GET_COUNTER(TE_SOC_PKG_SLOT);
         GET_COUNTER(TE_C_AND_G_SLOT);
@@ -111,9 +122,9 @@ int main(int argc, char **argv)
         GET_COUNTER(TE_DLA_IN_SLOT);
         GET_COUNTER(TE_PREREG_IN_SLOT);
         printf("\n");
-        usleep(500000);
+        fflush(stdout);
+        usleep(1000000);
     }
-    fflush(stdout);
 
     if (munmap(map_base, map_size) != 0)
     {
