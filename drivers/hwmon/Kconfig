@@ -2752,6 +2752,16 @@ config SENSORS_HP_WMI
 	  This driver can also be built as a module. If so, the module
 	  will be called hp_wmi_sensors.
 
+config SENSORS_SPBM
+	tristate "GB10 SPBM sensors"
+	depends on ACPI
+	help
+	  If you say yes here you get support for the GB10 ACPI SPBM hardware monitoring
+	  interface found in DGX-SPARK and RTX-SPARK devices
+
+	  This driver can also be built as a module. If so, the module
+	  will be called spbm.
+
 endif # ACPI
 
 endif # HWMON
